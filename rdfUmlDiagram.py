@@ -133,6 +133,7 @@ class RDFtoUmlDiagram():
                            '.n3': 'n3',
                            '.ttl': 'turtle',
                            '.nt': 'nt',
+                           '.trig': 'trig',
                            '.nq': 'nquads',
                            '': 'turtle'}
             extension = splitext(filename.name)[1]
@@ -186,7 +187,8 @@ class RDFtoUmlObjectDiagram(RDFtoUmlDiagram):
     def create_diagram(self):
         # Iterate over all graphs
         for graph in self.ds.contexts():
-            self.start_subgraph(graph.n3())
+            graph_name = graph.n3()
+            self.start_subgraph(graph_name)
             graph = graph.skolemize()
 
             query_nodes = """SELECT DISTINCT ?node
@@ -194,7 +196,10 @@ class RDFtoUmlObjectDiagram(RDFtoUmlDiagram):
                             ?node a ?class.
                         }"""
             result_nodes = graph.query(query_nodes)
-            
+
+            if not result_nodes:
+                print("Warning: No instances (rdf:type) defined in graph %s" % graph_name)
+
             for row_nodes in result_nodes:
                 query_classes = """SELECT DISTINCT ?class
                         WHERE {
