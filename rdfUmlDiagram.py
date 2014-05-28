@@ -125,8 +125,10 @@ class RDFtoUmlDiagram():
         self.ds = Dataset()
         self.d = UmlGraphVizDiagram(output_filename)
 
-    def load_rdf(self, filename):
-        if filename is not sys.stdin:
+    def load_rdf(self, filename, input_format=None):
+        if input_format:
+            rdf_format = input_format
+        elif filename is not sys.stdin:
             format_list = {'.xml': 'xml',
                            '.rdf': 'xml',
                            '.owl': 'xml',
@@ -201,6 +203,7 @@ class RDFtoUmlObjectDiagram(RDFtoUmlDiagram):
                 print("Warning: No instances (rdf:type) defined in graph %s" % graph_name)
 
             for row_nodes in result_nodes:
+                # adding the classes to the node (can be more than one)
                 query_classes = """SELECT DISTINCT ?class
                         WHERE {
                             %s a ?class.
@@ -209,6 +212,7 @@ class RDFtoUmlObjectDiagram(RDFtoUmlDiagram):
                 classes = []
                 for row_classes in result_classes:
                     classes.append(self.ds.namespace_manager.qname(row_classes['class']))
+                # adding the attributes to the node
                 query_attributes = """SELECT DISTINCT ?p ?o
                             WHERE {
                                 %s ?p ?o.
@@ -291,21 +295,23 @@ if __name__ == '__main__':
 
     # Initialize command line parser
     parser = argparse.ArgumentParser(description='Creates UML Object Diagram from RDF(S) files')
-    parser.add_argument('filename', nargs='+', type=argparse.FileType('r'), help='rdf file')
-    parser.add_argument('-o', '--output', nargs='?', help='Output graphics file')
-    parser.add_argument('-s', '--rdfs', action='store_true', help='Input files should be treated as RDFS')
-    parser.add_argument('-n', '--namespace', nargs=2, action='append', help='Additional namespaces')
+    parser.add_argument('filename', nargs='+', type=argparse.FileType('r'), help='RDF file')
+    parser.add_argument('-o', '--output', dest='png_file', nargs=1, help='Output graphics file (default is FILENAME.png)')
+    parser.add_argument('-s', '--rdfs', action='store_true', help='Input files should be treated as RDFS providing a class diagram instead of an object diagram')
+    parser.add_argument('-n', '--namespace', dest='namespace', nargs=2, action='append', help='Additional namespaces')
+    parser.add_argument('-i', '--input', dest='format', nargs=1, help='Input format (xml, n3, turtle, nt, trix, trig). When blank than it is guessed from file name extension')
     args = parser.parse_args()
 
-    if args.output:
-        output = args.output
+    if args.png_file:
+        output = args.png_file[0]
     else:
         output = args.filename[0].name + '.png'
+
     if args.rdfs:
         d = RDFStoUmlClassDiagram(output)
     else:
         d = RDFtoUmlObjectDiagram(output)
     for f in args.filename:
-        d.load_rdf(f)
+        d.load_rdf(f, args.format[0])
     d.add_namespaces(args.namespace)
     d.create_diagram()
