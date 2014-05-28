@@ -254,14 +254,14 @@ class RDFStoUmlClassDiagram(RDFtoUmlDiagram):
                             {?class a <http://www.w3.org/2000/01/rdf-schema#Class>.}
                             UNION
                             {?class a <http://www.w3.org/2002/07/owl#Class>.}
-                        }"""
+                        } ORDER BY ?class"""
             result2 = graph.query(query2)
             for row2 in result2:
                 query3 = """SELECT DISTINCT ?property
                             WHERE {
                                 ?property rdfs:domain %s;
                                     a <http://www.w3.org/2002/07/owl#DataTypeProperty>.
-                            }""" % row2['class'].n3()
+                            } ORDER BY ?property""" % row2['class'].n3()
                 result3 = graph.query(query3)
                 attributes = []
                 for r in result3:
@@ -274,7 +274,7 @@ class RDFStoUmlClassDiagram(RDFtoUmlDiagram):
                            ?property a <http://www.w3.org/2002/07/owl#ObjectProperty>;
                                 rdfs:domain ?src;
                                 rdfs:range ?dest.
-                        }"""
+                        } ORDER BY ?src ?property ?dest"""
             result4 = graph.query(query4)
             for row4 in result4:
                 self.add_edge(row4['src'], row4['dest'], row4['property'])
@@ -282,7 +282,7 @@ class RDFStoUmlClassDiagram(RDFtoUmlDiagram):
             query_subclass = """SELECT DISTINCT ?src ?dest
                         WHERE {
                            ?src rdfs:subClassOf ?dest.
-                        }"""
+                        } ORDER BY ?src ?dest"""
             result_subclass = graph.query(query_subclass)
             for row_subclass in result_subclass:
                 self.add_subclass_edge(row_subclass['src'],row_subclass['dest'])
