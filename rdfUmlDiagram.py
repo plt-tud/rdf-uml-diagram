@@ -171,6 +171,7 @@ class RDFtoUmlDiagram():
     def create_namespace_box(self):
         # Create Namespace box
         namespaces = "Namespaces:\l"
+        # TODO: Order namespace according to prefix name
         for ns in self.ds.namespaces():
             namespaces += "%s: %s \l" % (ns[0], ns[1])
         self.d.add_label(namespaces)
@@ -196,7 +197,7 @@ class RDFtoUmlObjectDiagram(RDFtoUmlDiagram):
             query_nodes = """SELECT DISTINCT ?node
                         WHERE {
                             ?node a ?class.
-                        }"""
+                        } ORDER BY ?node"""
             result_nodes = graph.query(query_nodes)
 
             if not result_nodes:
@@ -207,7 +208,7 @@ class RDFtoUmlObjectDiagram(RDFtoUmlDiagram):
                 query_classes = """SELECT DISTINCT ?class
                         WHERE {
                             %s a ?class.
-                        }""" % row_nodes['node'].n3()
+                        } ORDER BY ?class""" % row_nodes['node'].n3()
                 result_classes = graph.query(query_classes)
                 classes = []
                 for row_classes in result_classes:
@@ -217,7 +218,7 @@ class RDFtoUmlObjectDiagram(RDFtoUmlDiagram):
                             WHERE {
                                 %s ?p ?o.
                                 FILTER (isLiteral(?o))
-                            }""" % row_nodes['node'].n3()
+                            } ORDER BY ?p ?o""" % row_nodes['node'].n3()
                 result_attributes = graph.query(query_attributes)
                 attributes = []
                 for row_attributes in result_attributes:
@@ -229,7 +230,7 @@ class RDFtoUmlObjectDiagram(RDFtoUmlDiagram):
                             ?c1 ?p ?c2.
                             FILTER (!isLiteral(?c2))
                             FILTER (?p != rdf:type)
-                        }"""
+                        } ORDER BY ?c1 ?p ?c2"""
             result_connections = graph.query(query_connections)
             for row_connections in result_connections:
                 self.add_edge(row_connections['c1'], row_connections['c2'], row_connections['p'])
@@ -311,7 +312,11 @@ if __name__ == '__main__':
         d = RDFStoUmlClassDiagram(output)
     else:
         d = RDFtoUmlObjectDiagram(output)
+    if args.format:
+        format = args.format[0]
+    else:
+        format = None
     for f in args.filename:
-        d.load_rdf(f, args.format[0])
+        d.load_rdf(f, format)
     d.add_namespaces(args.namespace)
     d.create_diagram()
