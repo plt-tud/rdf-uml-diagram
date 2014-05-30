@@ -16,7 +16,6 @@ Its executable 'dot' has to be on PATH. It uses SPARQL to get nodes. Thus, also 
 @todo: Autodetect if graph contains RDFS vocabulary
 @todo: Add OWL features
 @todo: Use iGraph (http://igraph.sourceforge.net/) for visualizing the graphs
-@todo: Use filenames for graph names instead of random names if no named graph available
 
 @license: 
     Licensed under the EUPL, Version 1.1 or – as soon they
@@ -37,85 +36,11 @@ Its executable 'dot' has to be on PATH. It uses SPARQL to get nodes. Thus, also 
     permissions and limitations under the Licence.
 """
 
-from subprocess import call
-import logging
 from os.path import splitext
 from rdflib import Dataset
 
-
-trantab = str.maketrans("./:-#", "_____")
-
-def graphviz_id(uri):
-    return str(uri).translate(trantab)
-
-
-class UmlGraphVizDiagram():
-    """
-    Creates a diagram similar to the class diagrams and objects diagrams from UML using GraphViz
-    """
-    def __init__(self, filename='output.png'):
-        logging.basicConfig()
-        self.filename_png = filename
-        self.filename_dot = self.filename_png + '.dot'
-        self.f = open(self.filename_dot, 'w')
-        self.f.write("""digraph G {
-                            fontname = "Bitstream Vera Sans";
-                            fontsize = 8;
-                            node [ shape = "record" ];\n""")
-        self.connected_nodes = set()
-        self.described_nodes = set()
-
-    def add_node(self, node_id, node_label):
-        self.f.write('%s [label = <{%s | }>];\n' % (node_id, node_label))
-
-    def add_class_node(self, class_name, attributes):
-        self.described_nodes.add(class_name)
-        self.f.write('%s [label = <{<b>%s</b> | ' % ( graphviz_id(class_name), class_name))
-        for a in attributes:
-            self.f.write('%s<br/>' % a)
-        self.f.write('}>];\n')
-
-    def add_object_node(self, object_name, class_name, attributes):
-        self.described_nodes.add(object_name)
-        self.f.write('%s [label = <{<b><u>%s (%s)</u></b>| ' % (graphviz_id(object_name), object_name, class_name))
-        for a in attributes:
-            self.f.write('%s<br/>' % a)
-        self.f.write('}>];\n')
-
-    def add_edge(self, src, dst, name):
-        self.connected_nodes.add(src)
-        self.connected_nodes.add(dst)
-        self.f.write('%s -> %s [label="%s", arrowhead="open"];\n' % (graphviz_id(src), graphviz_id(dst), name))
-
-    def add_subclass_edge(self, src, dst):
-        self.f.write('%s -> %s [arrowhead="empty"];\n' % (graphviz_id(src), graphviz_id(dst)))
-
-    def add_label(self, label):
-        self.f.write('label="%s";\n' % label)
-
-    def start_subgraph(self, graph_name):
-        self.f.write('subgraph cluster_%s {label = "%s";\n' % (
-        graphviz_id(graph_name), graph_name))
-
-    def close_subgraph(self):
-        self.f.write('}\n')
-    
-    def add_undescribed_nodes(self):
-        s = self.connected_nodes-self.described_nodes
-        for node in s:
-            self.add_node(graphviz_id(node), node)
-    
-    def close(self):
-        self.add_undescribed_nodes()
-        self.f.write("}\n")
-        self.f.close()
-
-    def visualize(self, open_png=False):
-        call("dot -Tpng -o %s %s" % (self.filename_png, self.filename_dot), shell=True)
-        print("png created: " + self.filename_png)
-        if open_png:
-            call("xdg-open %s" % self.filename_png, shell=True)
-
+from umlpygraphvizdiagram import UmlPygraphVizDiagram
+from umlgraphvizdiagram import UmlGraphVizDiagram
 
 class RDFtoUmlDiagram():
     """
@@ -123,7 +48,8 @@ class RDFtoUmlDiagram():
     """
     def __init__(self, output_filename='output.png'):
         self.ds = Dataset()
-        self.d = UmlGraphVizDiagram(output_filename)
+        #self.d = UmlGraphVizDiagram(output_filename)
+        self.d = UmlPygraphVizDiagram(output_filename)
 
     def load_rdf(self, filename, input_format=None):
         if input_format:
@@ -191,7 +117,8 @@ class RDFtoUmlObjectDiagram(RDFtoUmlDiagram):
         # Iterate over all graphs
         for graph in self.ds.contexts():
             graph_name = graph.n3()
-            self.start_subgraph(graph_name)
+            if graph_name == "[<urn:x-rdflib:default>]":
+                break
             graph = graph.skolemize()
 
             query_nodes = """SELECT DISTINCT ?node
@@ -200,9 +127,11 @@ class RDFtoUmlObjectDiagram(RDFtoUmlDiagram):
                         } ORDER BY ?node"""
             result_nodes = graph.query(query_nodes)
 
-            if not result_nodes:
+            if result_nodes:
+                self.start_subgraph(graph_name)
+            else:
                 print("Warning: No instances (rdf:type) defined in graph %s" % graph_name)
-
+                
             for row_nodes in result_nodes:
                 # adding the classes to the node (can be more than one)
                 query_classes = """SELECT DISTINCT ?class
@@ -246,7 +175,9 @@ class RDFStoUmlClassDiagram(RDFtoUmlDiagram):
     def create_diagram(self):
         # Iterate over all graphs
         for graph in self.ds.contexts():
-            self.start_subgraph(graph.n3())
+            graph_name = graph.n3()
+            if graph_name == "[<urn:x-rdflib:default>]":
+                break
             graph = graph.skolemize()
 
             query2 = """SELECT DISTINCT ?class
@@ -256,6 +187,8 @@ class RDFStoUmlClassDiagram(RDFtoUmlDiagram):
                             {?class a <http://www.w3.org/2002/07/owl#Class>.}
                         } ORDER BY ?class"""
             result2 = graph.query(query2)
+            if result2:
+                self.start_subgraph(graph_name)
             for row2 in result2:
                 query3 = """SELECT DISTINCT ?property
                             WHERE {
@@ -299,8 +232,8 @@ if __name__ == '__main__':
     parser.add_argument('filename', nargs='+', type=argparse.FileType('r'), help='RDF file')
     parser.add_argument('-o', '--output', dest='png_file', nargs=1, help='Output graphics file (default is FILENAME.png)')
     parser.add_argument('-s', '--rdfs', action='store_true', help='Input files should be treated as RDFS providing a class diagram instead of an object diagram')
-    parser.add_argument('-n', '--namespace', dest='namespace', nargs=2, action='append', help='Additional namespaces')
-    parser.add_argument('-i', '--input', dest='format', nargs=1, help='Input format (xml, n3, turtle, nt, trix, trig). When blank than it is guessed from file name extension')
+    parser.add_argument('-n', '--namespace', metavar=('PREFIX', 'NAMESPACE'), nargs=2, action='append', help='Additional namespaces')
+    parser.add_argument('-i', '--input', dest='format', nargs=1, default=(None,), help='Input format (xml, n3, turtle, nt, trix, trig). When blank than it is guessed from file name extension')
     args = parser.parse_args()
 
     if args.png_file:
@@ -312,11 +245,7 @@ if __name__ == '__main__':
         d = RDFStoUmlClassDiagram(output)
     else:
         d = RDFtoUmlObjectDiagram(output)
-    if args.format:
-        format = args.format[0]
-    else:
-        format = None
     for f in args.filename:
-        d.load_rdf(f, format)
+        d.load_rdf(f, args.format[0])
     d.add_namespaces(args.namespace)
     d.create_diagram()
