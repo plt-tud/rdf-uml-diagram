@@ -11,7 +11,7 @@ def graphviz_id(uri):
 
 class UmlPygraphVizDiagram():
     """
-    Creates a diagram similar to the class diagrams and objects diagrams from UML using GraphViz
+    Creates a diagram similar to the class diagrams and objects diagrams from UML using pygraphviz
     """
     def __init__(self, filename='output.png'):
         logging.basicConfig()
@@ -30,18 +30,12 @@ class UmlPygraphVizDiagram():
 
     def add_class_node(self, class_name, attributes):
         self.described_nodes.add(class_name)
-        label = "<{<b>%s</b> | " % class_name
-        for a in attributes:
-            label += '%s<br/>' % a
-        label += '}>'
+        label = "<{<b>%s</b> | %s }>" % (class_name, "<br/>".join(attributes))
         self.subgraph.add_node(graphviz_id(class_name), label=label)
 
     def add_object_node(self, object_name, class_name, attributes):
         self.described_nodes.add(class_name)
-        label = '<{<b><u>%s (%s)</u></b>| ' % (object_name, class_name)
-        for a in attributes:
-            label += '%s<br/>' % a
-        label += '}>'
+        label = "<{<b><u>%s (%s)</u></b>| %s }>" % (object_name, class_name, '<br/>'.join(attributes))
         self.subgraph.add_node(graphviz_id(object_name), label=label)
 
     def add_edge(self, src, dst, name):

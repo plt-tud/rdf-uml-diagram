@@ -96,11 +96,10 @@ class RDFtoUmlDiagram():
 
     def create_namespace_box(self):
         # Create Namespace box
-        namespaces = "Namespaces:\l"
+        self.d.add_label("Namespaces:\l")
         # TODO: Order namespace according to prefix name
         for ns in self.ds.namespaces():
-            namespaces += "%s: %s \l" % (ns[0], ns[1])
-        self.d.add_label(namespaces)
+            self.d.add_label("%s:\t%s \l" % (ns[0], ns[1]))
 
     def close_and_visualize(self):
         self.create_namespace_box()
