@@ -9,9 +9,9 @@ Its executable 'dot' has to be on PATH. It uses SPARQL to get nodes. Thus, also 
 @author: Markus Graube
 @contact: markus.graube@tu-dresden.de
 @organization: Professur fuer Prozessleittechnik, Technische Universität Dresden (http://www.et.tu-dresden.de/ifa/?id=plt)
-@version: 0.4
-@date: 2014-02-19
-@copyright: Professur fuer Prozessleittechnik, 2013
+@version: 0.2
+@date: 2014-06-02
+@copyright: Professur fuer Prozessleittechnik, 2014
 
 @todo: Autodetect if graph contains RDFS vocabulary
 @todo: Add OWL features
