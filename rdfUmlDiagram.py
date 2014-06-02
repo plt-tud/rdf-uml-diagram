@@ -15,7 +15,6 @@ Its executable 'dot' has to be on PATH. It uses SPARQL to get nodes. Thus, also 
 
 @todo: Autodetect if graph contains RDFS vocabulary
 @todo: Add OWL features
-@todo: Use iGraph (http://igraph.sourceforge.net/) for visualizing the graphs
 
 @license: 
     Licensed under the EUPL, Version 1.1 or – as soon they
@@ -97,8 +96,7 @@ class RDFtoUmlDiagram():
     def create_namespace_box(self):
         # Create Namespace box
         self.d.add_label("Namespaces:\l")
-        # TODO: Order namespace according to prefix name
-        for ns in self.ds.namespaces():
+        for ns in sorted(self.ds.namespaces()):
             self.d.add_label("%s:\t%s \l" % (ns[0], ns[1]))
 
     def close_and_visualize(self):
