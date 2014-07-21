@@ -1,0 +1,41 @@
+@prefix cm: <http://comvantage.eu/graph-trans/cae/meta#> . 
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+cm:Plant a rdfs:Class;
+    rdfs:label "class".
+
+cm:Subplant a rdfs:Class;
+    rdfs:label "subclass".
+    
+cm:Device a rdfs:Class;
+    rdfs:label "device".
+
+cm:Pump a rdfs:Class;
+    rdfs:subClassOf cm:Device;
+    rdfs:label "pump".
+
+cm:Vessel a rdfs:Class;
+    rdfs:subClassOf cm:Device;
+    rdfs:label "vessel".
+
+cm:Valve a rdfs:Class;
+    rdfs:subClassOf cm:Device;
+    rdfs:label "valve".
+    
+
+cm:isConnectedTo a owl:ObjectProperty;
+    rdfs:label "is connected to";
+    rdfs:domain cm:Device;
+    rdfs:range cm:Device.
+    
+cm:hasSubPlant a owl:ObjectProperty;
+    rdfs:label "has subplant";
+    rdfs:domain cm:Plant;
+    rdfs:range cm:Subplant.
+
+cm:hasDevice a owl:ObjectProperty;
+    rdfs:label "has device";
+    rdfs:domain cm:Subplant;
+    rdfs:range cm:Device.

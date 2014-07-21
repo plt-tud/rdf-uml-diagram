@@ -1,0 +1,38 @@
+@prefix cm: <http://comvantage.eu/graph-trans/cae/meta#> .
+@prefix ci:  <http://comvantage.eu/graph-trans/cae/ex1#> . 
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+
+
+ci:A1 a cm:Plant;
+    rdfs:label "SCE.A1";
+    cm:hasSubPlant ci:A1-T1, ci:A1-T2.
+    
+
+ci:A1-T1 a cm:Subplant;
+    rdfs:label "SCE.A1.T1";
+    cm:hasDevice ci:A1-T1-P1, ci:A1-T1-V1, ci:A1-T1-B1.
+    
+ci:A1-T2 a cm:Subplant;
+    rdfs:label "SCE.A1.T2";
+    cm:hasDevice ci:A1-T2-V1, ci:A1-T2-B1.
+    
+ci:A1-T1-B1 a cm:Vessel;
+    rdfs:label "SCE.A1.T1.B1";
+    cm:isConnectedTo ci:A1-T1-V1.
+    
+ci:A1-T1-V1 a cm:Valve;
+    rdfs:label "SCE.A1.T1.V1";
+    cm:isConnectedTo ci:A1-T1-P1.
+    
+ci:A1-T1-P1 a cm:Pump;
+    rdfs:label "SCE.A1.T1.P1";
+    cm:isConnectedTo ci:A1-T2-V1.
+    
+
+ci:A1-T2-V1 a cm:Pump;
+    rdfs:label "SCE.A1.T2.V1";
+    cm:isConnectedTo ci:A1-T2-B1.
+    
+ci:A1-T2-B1 a cm:Vessel;
+    rdfs:label "SCE.A1.T2.B1";
+    .
