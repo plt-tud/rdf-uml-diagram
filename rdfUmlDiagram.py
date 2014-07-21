@@ -4,13 +4,16 @@
 """
 Converts RDF files to PNG diagrams which are similar to UML diagrams.
 The layout is done by Graphviz (http://www.graphviz.org/) which has to be installed (version>2.30)
-Its executable 'dot' has to be on PATH. It uses SPARQL to get nodes. Thus, also 'rdflib' is required.
+It uses SPARQL to get nodes. Thus, also 'rdflib' is required.
+Dependencies:
+ * pygraphviz
+ * rdflib
 
 @author: Markus Graube
 @contact: markus.graube@tu-dresden.de
 @organization: Professur fuer Prozessleittechnik, Technische Universität Dresden (http://www.et.tu-dresden.de/ifa/?id=plt)
-@version: 0.2
-@date: 2014-06-02
+@version: 0.3
+@date: 2014-07-21
 @copyright: Professur fuer Prozessleittechnik, 2014
 
 @todo: Autodetect if graph contains RDFS vocabulary
@@ -39,7 +42,7 @@ from os.path import splitext
 from rdflib import Dataset
 
 from umlpygraphvizdiagram import UmlPygraphVizDiagram
-from umlgraphvizdiagram import UmlGraphVizDiagram
+#from umlgraphvizdiagram import UmlGraphVizDiagram
 
 class RDFtoUmlDiagram():
     """
@@ -99,9 +102,14 @@ class RDFtoUmlDiagram():
         for ns in sorted(self.ds.namespaces()):
             self.d.add_label("%s:\t%s \l" % (ns[0], ns[1]))
 
-    def close_and_visualize(self):
+    def output_dot(self):
+        self.d.write_to_file()
+
+    def close(self):
         self.create_namespace_box()
         self.d.close()
+
+    def visualize(self):
         self.d.visualize()
 
 
@@ -160,7 +168,6 @@ class RDFtoUmlObjectDiagram(RDFtoUmlDiagram):
             result_connections = graph.query(query_connections)
             for row_connections in result_connections:
                 self.add_edge(row_connections['c1'], row_connections['c2'], row_connections['p'])
-        self.close_and_visualize()
 
 
 
@@ -190,7 +197,7 @@ class RDFStoUmlClassDiagram(RDFtoUmlDiagram):
                 query3 = """SELECT DISTINCT ?property
                             WHERE {
                                 ?property rdfs:domain %s;
-                                    a <http://www.w3.org/2002/07/owl#DataTypeProperty>.
+                                    a <http://www.w3.org/2002/07/owl#DatatypeProperty>.
                             } ORDER BY ?property""" % row2['class'].n3()
                 result3 = graph.query(query3)
                 attributes = []
@@ -216,7 +223,6 @@ class RDFStoUmlClassDiagram(RDFtoUmlDiagram):
             result_subclass = graph.query(query_subclass)
             for row_subclass in result_subclass:
                 self.add_subclass_edge(row_subclass['src'],row_subclass['dest'])
-        self.close_and_visualize()
 
 
 
@@ -228,6 +234,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Creates UML Object Diagram from RDF(S) files')
     parser.add_argument('filename', nargs='+', type=argparse.FileType('r'), help='RDF file')
     parser.add_argument('-o', '--output', dest='png_file', nargs=1, help='Output graphics file (default is FILENAME.png)')
+    parser.add_argument('-d', '--dot', action='store_true', help='Save DOT file')
     parser.add_argument('-s', '--rdfs', action='store_true', help='Input files should be treated as RDFS providing a class diagram instead of an object diagram')
     parser.add_argument('-n', '--namespace', metavar=('PREFIX', 'NAMESPACE'), nargs=2, action='append', help='Additional namespaces')
     parser.add_argument('-i', '--input', dest='format', nargs=1, default=(None,), help='Input format (xml, n3, turtle, nt, trix, trig). When blank than it is guessed from file name extension')
@@ -246,3 +253,7 @@ if __name__ == '__main__':
         d.load_rdf(f, args.format[0])
     d.add_namespaces(args.namespace)
     d.create_diagram()
+    d.close()
+    if args.dot:
+        d.output_dot()
+    d.visualize()

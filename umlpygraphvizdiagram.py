@@ -15,7 +15,7 @@ class UmlPygraphVizDiagram():
     """
     def __init__(self, filename='output.png'):
         logging.basicConfig()
-        self.filename_png = filename
+        self.filename = filename
         self.graph = AGraph(directed=True, strict=False)
         self.graph.node_attr['shape']='record'
         self.graph.graph_attr['fontsize']='8'
@@ -62,8 +62,13 @@ class UmlPygraphVizDiagram():
         for node in s:
             self.graph.add_node(graphviz_id(node), node)
 
+    def write_to_file(self):
+        filename_dot = self.filename + '.dot'
+        f = open(filename_dot, 'w')
+        f.write(self.graph.string())
+        print("png created: " + filename_dot)
+
     def visualize(self):
-        #print(self.graph.string())
         self.graph.layout(prog='dot')
-        self.graph.draw(self.filename_png)
-        print("png created: " + self.filename_png)
+        self.graph.draw(self.filename)
+        print("png created: " + self.filename)
