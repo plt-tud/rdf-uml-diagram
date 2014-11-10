@@ -42,7 +42,7 @@ from os.path import splitext
 from rdflib import Dataset
 
 from umlpygraphvizdiagram import UmlPygraphVizDiagram
-#from umlgraphvizdiagram import UmlGraphVizDiagram
+
 
 class RDFtoUmlDiagram():
     """
