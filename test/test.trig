@@ -3,21 +3,22 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix dc: <http://purl.org/dc/terms/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix ex: <http://example.org/> .
 
 
 
 <http://example.org/bob>
     {
-       <a> a foaf:Person.
-       <a> foaf:name "Bob" .
-       <a> foaf:mbox <mailto:bob@oldcorp.example.org> .
-       <a> foaf:knows <b> .
+       ex:a a foaf:Person.
+       ex:a foaf:name "Bob" .
+       ex:a foaf:mbox "bob@oldcorp.example.org" .
+       ex:a foaf:knows ex:b .
     }
 
 <http://example.org/alice>
     {
-       <b> a foaf:Person.
-       <b> foaf:name "Alice" .
-       <b> foaf:firstName "sdg".
-       <b> foaf:mbox <mailto:alice@work.example.org> .
+       ex:b a foaf:Person.
+       ex:b foaf:name "Alice" .
+       ex:b foaf:firstName "Alice".
+       ex:b foaf:mbox "mailto:alice@work.example.org" .
     }   

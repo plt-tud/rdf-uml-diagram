@@ -2,6 +2,7 @@
 @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 cm:Plant a rdfs:Class;
     rdfs:label "class".
@@ -39,3 +40,8 @@ cm:hasDevice a owl:ObjectProperty;
     rdfs:label "has device";
     rdfs:domain cm:Subplant;
     rdfs:range cm:Device.
+    
+cm:rfid a owl:DatatypeProperty;
+    rdfs:label "RFID tag";
+    rdfs:domain cm:Device;
+    rdfs:range xsd:string.
