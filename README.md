@@ -13,4 +13,12 @@ Dependencies
     * rdflib (https://github.com/RDFLib)
     * pygraphviz (https://pygraphviz.github.io/)
 
+Examples
+--------
+```
+./rdfUmlDiagram.py test/test.trig
+```
+![Sample1](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/test.trig.png "test.trig.png")
+
+
 
