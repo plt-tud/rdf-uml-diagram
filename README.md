@@ -18,7 +18,27 @@ Examples
 ```
 ./rdfUmlDiagram.py test/test.trig
 ```
-![Sample1](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/test.trig.png "test.trig.png")
+![Sample1](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/test.trig.svg "test.trig.svg")
 
 
+
+
+```
+./rdfUmlDiagram.py test/cae_example1.ttl
+```
+![Sample2](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/cae_example1.ttl.svg "cae_example1.ttl.svg")
+
+
+
+```
+./rdfUmlDiagram.py test/cae_meta.ttl
+```
+![Sample4](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/cae_meta.ttl.svg "cae_meta.ttl.svg")
+
+
+
+```
+./rdfUmlDiagram.py test/rdftest.ttl
+```
+![Sample4](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/rdftest.ttl.svg "rdftest.ttl.svg")
 

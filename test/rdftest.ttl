@@ -1,0 +1,177 @@
+﻿@prefix cm: <http://comvantage.eu/graph-trans/cae/meta#> . 
+@prefix ci:  <http://comvantage.eu/graph-trans/cae/ex1#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ex:   <http://www.example.org/#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix mso: <http://eatld.et.tu-dresden.de/mso/#>.
+
+
+#jeder Taenzer ist eine Person
+ex:Person a rdfs:Class;
+    rdfs:label "Class von Person".
+
+ex:Taenzer a rdfs:Class;
+     rdfs:subClassOf ex:Person.
+     
+[] a owl:Restriction;
+     owl:onProperty ex:tanztTanz;
+     owl:maxCardinality "6";
+     owl:minCardinality "4".
+
+ex:Name a owl:DatatypeProperty;
+   rdfs:label "Name von Taenzer";
+   rdfs:domain ex:Taenzer;
+   rdfs:range  xsd:string.
+
+
+
+ex:Tanz a rdfs:Class.
+
+# ein Paartanz ist eine Unterart eines Tanzes
+ex:Paartanz a rdfs:Class;
+   rdfs:subClassOf ex:Tanz.
+   
+ex:Name a owl:DatatypeProperty;
+   rdfs:label "Name von Paartanz";
+   rdfs:domain ex:Paartanz;
+   rdfs:range  xsd:string.
+
+# ein Einzeltanz ist eine Unterart eines Tanzes
+ex:Einzeltanz a rdfs:Class;
+   rdfs:subClassOf ex:Tanz.
+
+ex:Name a owl:DatatypeProperty;
+   rdfs:label "Name von Einzeltanz";
+   rdfs:domain ex:Einzeltanz;
+   rdfs:range  xsd:string.
+
+#DatatypeProperty(:string neuere funktion)
+ex:Geburtstag a owl:DatatypeProperty;
+    rdfs:label "Geburtstag von Person";
+    rdfs:domain ex:Person;
+    rdfs:range xsd:dateTime.
+
+ex:Name a owl:DatatypeProperty;
+   rdfs:label "Name von Person";
+   rdfs:domain ex:Person;
+   rdfs:range  xsd:string.
+
+ex:Adresse a owl:DatatypeProperty;
+   rdfs:label "Adresse von Person";
+   rdfs:domain ex:Person;
+   rdfs:range  xsd:string.
+
+ex:Name a owl:DatatypeProperty;
+   rdfs:label "Name von Tanz";
+   rdfs:domain ex:Tanz;
+   rdfs:range  xsd:string.
+
+ex:Autor a owl:DatatypeProperty;
+   rdfs:label "Autor von Tanz";
+   rdfs:domain ex:Tanz;
+   rdfs:range  xsd:string.
+
+ex:Datum a owl:DatatypeProperty;
+   rdfs:label "Datum von Tanz";
+   rdfs:domain ex:Tanz;
+   rdfs:range  xsd:dateTime.
+
+ex:tanztTanz a owl:ObjectProperty;
+   rdfs:domain ex:Taenzer;
+   rdfs:range ex:Tanz .
+
+ex:tanztGernePaartanz a owl:ObjectProperty;
+   rdfs:subPropertyOf ex:tanztTanz;
+   rdfs:domain ex:Taenzer;
+   rdfs:range ex:Paartanz.
+
+ex:Lieblingstaenze rdf:type rdfs:ContainerMembershipProperty,owl:ObjectProperty ;
+   rdfs:subPropertyOf ex:tanztTanz;
+   rdfs:domain ex:Taenzer;
+   rdfs:range ex:Tanz.
+
+ex:istEntstandenAus a owl:ObjectProperty;
+   rdfs:domain ex:Tanz;
+   rdfs:range ex:Tanz.
+
+ex:dance a rdfs:Class;
+    owl:equivalentClass ex:Tanz.
+
+ex:Name a owl:DatatypeProperty;
+   rdfs:label "Name von dance";
+   rdfs:domain ex:dance;
+   rdfs:range  xsd:string.
+
+ex:Autor a owl:DatatypeProperty;
+   rdfs:label "Autor von dance";
+   rdfs:domain ex:dance;
+   rdfs:range  xsd:string.
+
+ex:Datum a owl:DatatypeProperty;
+   rdfs:label "Datum von dance";
+   rdfs:domain ex:dance;
+   rdfs:range  xsd:dateTime.
+
+
+cm:MusicDrama  a rdfs:Class;
+    owl:unionOf cm:Opera, cm:Operetta, cm:Musical.
+
+ex:Name a owl:DatatypeProperty;
+   rdfs:label "Name von MusicDrama";
+   rdfs:domain cm:MusicDrama;
+   rdfs:range  xsd:string.
+
+
+cm:Opera a rdfs:Class;
+     owl:oneOf  ci:Opera1,  ci:Opera2, ci:Opera3.
+
+ex:Name a owl:DatatypeProperty;
+   rdfs:label "Name von Opera";
+   rdfs:domain cm:Opera;
+   rdfs:range  xsd:string.
+
+cm:Operetta a rdfs:Class.
+
+ex:Name a owl:DatatypeProperty;
+   rdfs:label "Name von Operetta";
+   rdfs:domain cm:Operetta;
+   rdfs:range  xsd:string.
+
+cm:Musical a rdfs:Class.
+
+ex:Name a owl:DatatypeProperty;
+   rdfs:label "Name von Musical";
+   rdfs:domain cm:Musical;
+   rdfs:range  xsd:string.
+
+ci:Opera1 a cm:Opera.
+ci:Opera2 a cm:Opera.
+ci:Opera3 a cm:Opera.
+
+ex:firendOf a owl:SymmetricProperty,owl:ObjectProperty ;
+    rdfs:domain ex:Person;
+    rdfs:range    ex:Person.
+
+#Funktionalproperty
+mso:Unit a rdfs:Class.
+mso:ProcessCell a rdfs:Class.
+mso:isPartOfProcessCell rdf:type owl:FunctionalProperty ,
+                              		   owl:ObjectProperty ;
+                                      rdfs:label  "is part of plant";
+                                      rdfs:isDefinedBy <http://eatld.et.tu-dresden.de/mso> ;
+                     		rdfs:domain mso:Unit ;
+                     		rdfs:range mso:ProcessCell .
+
+mso:hasUnit rdf:type owl:InverseFunctionalProperty ,
+                  	        owl:ObjectProperty ;
+     		        rdfs:label "has sub plant"@en ;
+                                 rdfs:isDefinedBy <http://eatld.et.tu-dresden.de/mso> ;
+                                rdfs:domain mso:ProcessCell ;
+                                rdfs:range mso:Unit .
+		     # rdfs:domain mso:Unit ;
+                     	      #rdfs:range mso:ProcessCell .
+
+
+
