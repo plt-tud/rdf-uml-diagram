@@ -18,7 +18,7 @@ Examples
 ```
 ./rdfUmlDiagram.py test/test.trig
 ```
-![Sample1](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/test.trig.svg "test.trig.svg")
+![Sample1](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/test.trig.png "test.trig.png")
 
 
 
@@ -26,19 +26,19 @@ Examples
 ```
 ./rdfUmlDiagram.py test/cae_example1.ttl
 ```
-![Sample2](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/cae_example1.ttl.svg "cae_example1.ttl.svg")
+![Sample2](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/cae_example1.ttl.png "cae_example1.ttl.png")
 
 
 
 ```
 ./rdfUmlDiagram.py test/cae_meta.ttl
 ```
-![Sample4](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/cae_meta.ttl.svg "cae_meta.ttl.svg")
+![Sample4](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/cae_meta.ttl.png "cae_meta.ttl.png")
 
 
 
 ```
 ./rdfUmlDiagram.py test/rdftest.ttl
 ```
-![Sample4](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/rdftest.ttl.svg "rdftest.ttl.svg")
+![Sample4](https://github.com/plt-tud/rdf-uml-diagram/blob/master/test/rdftest.ttl.png "rdftest.ttl.png")
 
