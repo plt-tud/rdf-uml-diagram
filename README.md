@@ -7,6 +7,8 @@ Graphical representation of RDF set similar to UML diagrams
 
 The layout is done by Graphviz (http://www.graphviz.org/) which has to be installed (version>2.30)
 
+[![DOI](https://zenodo.org/badge/10866/plt-tud/rdf-uml-diagram.svg)](http://dx.doi.org/10.5281/zenodo.16013)
+
 Dependencies
 ------------
 * Python3
