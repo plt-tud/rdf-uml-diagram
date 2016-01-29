@@ -11,15 +11,18 @@ The layout is done by Graphviz (http://www.graphviz.org/) which has to be instal
 
 Dependencies
 ------------
-The tool needs Python3 and the following Python3 libraries
+The tool needs the following tools
+* GraphViz (http://www.graphviz.org/)
+* Python3 and the following Python3 libraries
     * rdflib (https://github.com/RDFLib)
     * pygraphviz (https://pygraphviz.github.io/)
 
 
+
 You can install them via pip (take care to use )
 ```
-pip3 install rdflib
-pip3 install pygraphviz
+apt-get install libgraphviz-dev
+pip3 install rdflib pygraphviz
 ```
 
 Examples
