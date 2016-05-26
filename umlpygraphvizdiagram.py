@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import re
 import logging
-
+import re
 from pygraphviz import AGraph
-
 
 trantab = str.maketrans("./:-#", "_____")
 
@@ -38,60 +36,90 @@ class UmlPygraphVizDiagram():
         self.subgraph.add_node(graphviz_id(class_name), label=label)
 
     def add_object_node(self, object_name, class_name, attributes):
-        self.described_nodes.add(class_name)
-        label = "<{<b><u>%s (%s)</u></b>| %s }>" % (
-            object_name, class_name, "<br align='left'/>".join(attributes) + "<br align='left'/>")
+        self.described_nodes.add(object_name)
+        if class_name:
+            label = "<{<b><u>%s (%s)</u></b>| %s }>" % (
+                object_name, class_name, "<br align='left'/>".join(attributes) + "<br align='left'/>")
+        else:
+            label = "<{<b><u>%s</u></b>| %s }>" % (
+                object_name, "<br align='left'/>".join(attributes) + "<br align='left'/>")
         self.subgraph.add_node(graphviz_id(object_name), label=label)
 
     def add_edge(self, src, dst, name):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label=name, arrowhead="open")
 
     def add_cardinality_edge(self, src, dst, name, card):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label=name, arrowhead="open", labeldistance=2.0,
                             headlabel=card + "..." + card, labelangle=-65.0)
 
     def add_min_cardinality_edge(self, src, dst, name, card):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label=name, arrowhead="open", labeldistance=2.0,
                             headlabel=card + "...*", labelangle=-65.0)
 
     def add_max_cardinality_edge(self, src, dst, name, card):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label=name, arrowhead="open", labeldistance=2.0,
                             headlabel="0..." + card, labelangle=-65.0)
 
     def add_min_max_cardinality_edge(self, src, dst, name, min, max):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label=name, arrowhead="open", labeldistance=2.0,
                             headlabel=min + "..." + max, labelangle=-65.0)
 
     def add_list_edge(self, src, dst, name):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label=name, arrowtail="ediamond", dir="back",
                             headlabel="0...*", labeldistance=2.0, labelfontcolor="black", labelangle=-65.0)
 
     # self.graph.add_edge(graphviz_id(src), graphviz_id(dst),label=name,arrowtail="ediamond", dir="back",headlabel="0...*", taillabel=(dst.split(":")[1])+"s",labeldistance=2.0,labelfontcolor="black")
 
     def add_symmetric_edge(self, src, dst, name):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label=name, arrowhead="none")
 
     def add_functional_edge(self, src, dst, name):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label=name, arrowhead="open", headlabel="1...1",
                             taillabel="0...*", labeldistance=2.0, labelfontcolor="black", labelangle=-65.0)
 
     def add_inversefunctional_edge(self, src, dst, name):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label=name, arrowhead="open", headlabel="0...*",
                             taillabel="1...1", labeldistance=2.0, labelfontcolor="black", labelangle=-65.0)
 
     def add_equivalentclass_edge(self, src, dst):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label="\<\<equivalentClass\>\>", arrowhead="none",
                             style="dashed")
 
     def add_unionof_edge(self, src, dst):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label="\<\<unionOf\>\>", arrowhead="open",
                             style="dashed")
 
     def add_oneof_edge(self, src, dst):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), label="\<\<instanceOf\>\>", arrowhead="open",
                             style="dashed", dir="back")
 
     def add_subclass_edge(self, src, dst):
+        self.connected_nodes.add(src)
+        self.connected_nodes.add(dst)
         self.graph.add_edge(graphviz_id(src), graphviz_id(dst), arrowhead="empty")
 
 
@@ -105,7 +133,7 @@ class UmlPygraphVizDiagram():
     def add_undescribed_nodes(self):
         s = self.connected_nodes-self.described_nodes
         for node in s:
-            self.graph.add_node(graphviz_id(node), node)
+            self.graph.add_node(graphviz_id(node), label=node)
 
     def write_to_file(self, filename_dot):
         f = open(filename_dot, 'w')

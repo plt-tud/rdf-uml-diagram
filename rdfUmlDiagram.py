@@ -39,7 +39,6 @@ Dependencies:
 """
 
 from os.path import splitext
-
 from rdflib import Dataset
 
 from umlpygraphvizdiagram import UmlPygraphVizDiagram
@@ -50,9 +49,13 @@ class RDFtoUmlDiagram():
     Transform a RDF dataset to an UML diagram
     """
 
-    def __init__(self):
+    def __init__(self, showObjs, showClasses, namespace):
         self.ds = Dataset()
         self.d = UmlPygraphVizDiagram()
+        self.show_objs = showObjs
+        self.show_classes = showClasses
+        self.namespace = namespace
+        self.add_namespaces(self.namespace)
 
     def load_rdf(self, filename, input_format=None):
         if input_format:
@@ -123,16 +126,17 @@ class RDFtoUmlDiagram():
             graph = graph.skolemize()
             if len(graph) > 0:
                 self.start_subgraph(graph_name)
-                if object_nodes:
+                if self.show_objs:
                     self.create_object_nodes(graph)
-                if class_nodes:
+                if self.show_classes:
                     self.create_class_nodes(graph)
+        self.d.add_undescribed_nodes()
         self.create_namespace_box()
 
 
     def create_object_nodes(self, graph):
         # object nodes
-        query_nodes = """ PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        query_nodes = """PREFIX owl: <http://www.w3.org/2002/07/owl#>
                     SELECT DISTINCT ?node
                     WHERE {
                         ?node a ?class.
@@ -148,7 +152,13 @@ class RDFtoUmlDiagram():
             result_classes = graph.query(query_classes)
             classes = []
             for row_classes in result_classes:
-                classes.append(self.ds.namespace_manager.qname(row_classes['class']))
+                if not self.show_classes:
+                    classes.append(self.ds.namespace_manager.qname(row_classes['class']))
+                else:
+                    self.add_edge(row_nodes['node'], row_classes['class'],
+                                  "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+                
+
             # adding the attributes to the node
             query_attributes = """SELECT DISTINCT ?p ?o
                         WHERE {
@@ -248,7 +258,7 @@ if __name__ == '__main__':
         output = args.filename[0].name + '.svg'
 
     # Klassendiagramm erzeugen
-    d = RDFtoUmlDiagram()
+    d = RDFtoUmlDiagram(args.showobjs, args.showclasses, args.namespace)
 
     # Darstellungsoptionen
     print("showing objects: " + str(args.showobjs))
@@ -257,8 +267,7 @@ if __name__ == '__main__':
     # RDF-Format einstellen
     for f in args.filename:
         d.load_rdf(f, args.format[0])
-    d.add_namespaces(args.namespace)
-    d.create_diagram(args.showobjs, args.showclasses)
+    d.create_diagram()
     if args.dot:
         d.output_dot(output + ".dot")
     d.visualize(output)
