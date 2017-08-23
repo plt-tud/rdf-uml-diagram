@@ -159,10 +159,10 @@ class UmlPygraphVizDiagram():
         for ns in namespaceList:
             namespace = str(ns[0])  # Präfix des Namespaces
             url = str(ns[1])  # URL des Namespaces
-
-            regex_str = """%s:(\w+)""" % namespace
-            regex = re.compile(regex_str)
-            svg_string = regex.sub("""<a xlink:href='%s\\1'>%s:\\1</a>""" % (url, namespace), svg_string)
+            if namespace:  	    
+                regex_str = """%s:(\w+)""" % namespace
+                regex = re.compile(regex_str)
+                svg_string = regex.sub("""<a xlink:href='%s\\1'>%s:\\1</a>""" % (url, namespace), svg_string)
 
         # Datei schreiben
         svg_file = open(output, "w")

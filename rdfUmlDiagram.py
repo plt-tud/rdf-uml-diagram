@@ -49,12 +49,13 @@ class RDFtoUmlDiagram():
     Transform a RDF dataset to an UML diagram
     """
 
-    def __init__(self, showObjs, showClasses, namespace):
+    def __init__(self, namespace, showObjs=True, showClasses=False, showNamespace=True):
         self.ds = Dataset()
         self.d = UmlPygraphVizDiagram()
         self.show_objs = showObjs
         self.show_classes = showClasses
         self.namespace = namespace
+        self.show_namespaces = showNamespace
         self.add_namespaces(self.namespace)
 
     def load_rdf(self, filename, input_format=None):
@@ -117,7 +118,7 @@ class RDFtoUmlDiagram():
         self.d.visualize(filename, self.ds.namespaces())
 
 
-    def create_diagram(self, object_nodes=True, class_nodes=False):
+    def create_diagram(self):
         # Iterate over all graphs
         for graph in self.ds.contexts():
             graph_name = graph.n3()
@@ -131,7 +132,8 @@ class RDFtoUmlDiagram():
                 if self.show_classes:
                     self.create_class_nodes(graph)
         self.d.add_undescribed_nodes()
-        self.create_namespace_box()
+        if self.show_namespaces:
+            self.create_namespace_box()
 
 
     def create_object_nodes(self, graph):
@@ -241,14 +243,11 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='out', nargs=1, help='Output graphics file (default is FILENAME.svg)')
     parser.add_argument('-d', '--dot', action='store_true', help='Save DOT file')
     parser.add_argument('-n', '--namespace', metavar=('PREFIX', 'NAMESPACE'), nargs=2, action='append', help='Additional namespaces')
-    # Eigenschaften als Klasse anzeigen default=false
-    parser.add_argument('--object-nodes', dest='showobjs', action="store_true", default=True, help='Show Objects')
-    # Objekte von Klassen anzeigen default=false
-    parser.add_argument('--class-nodes', dest='showclasses', action="store_true", default=False, help='Show Classes')
-    #
+    parser.add_argument('--hide-instances', dest='hideobjs', action="store_true", help='Hide instances')
+    parser.add_argument('--show-classes', dest='showclasses', action="store_true", help='Show classes')
+    parser.add_argument('--hide-namespaces', dest='hidenamespaces', action="store_true", help='Hide namespace box')
     parser.add_argument('--ontology', dest='add_ontology', action="store_true",
                         help='Add ontology rdfs:definedBy properties')
-    # Eingabeformat der Datei angeben, ansonsten wird es aus Dateiendung geraten.
     parser.add_argument('-i', '--input', dest='format', nargs=1, default=(None,), help='Input format (xml, n3, turtle, nt, trix, trig). When blank than it is guessed from file name extension')
     args = parser.parse_args()
 
@@ -257,12 +256,13 @@ if __name__ == '__main__':
     else:
         output = args.filename[0].name + '.svg'
 
-    # Klassendiagramm erzeugen
-    d = RDFtoUmlDiagram(args.showobjs, args.showclasses, args.namespace)
-
-    # Darstellungsoptionen
-    print("showing objects: " + str(args.showobjs))
+    print("showing instances: " + str(not args.hideobjs))
     print("showing classes: " + str(args.showclasses))
+    print("showing namespaces: " + str(not args.hidenamespaces))
+    
+    # Klassendiagramm erzeugen
+    d = RDFtoUmlDiagram(args.namespace, not args.hideobjs, args.showclasses,  not args.hidenamespaces)
+
 
     # RDF-Format einstellen
     for f in args.filename:
